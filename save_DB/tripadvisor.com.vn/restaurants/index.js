@@ -38,6 +38,7 @@ const syncToMongoDB = async (datasetName) => {
             name: item.name,
             name_ascii: diacritics.remove(item.name),
             address: item.address,
+            region: item.region,
             region_name: item.region_name,
             tel: item.tel,
             website: item.website,
@@ -46,6 +47,7 @@ const syncToMongoDB = async (datasetName) => {
             description: item.description,
             description_ascii: item.short_description ? diacritics.remove(item.short_description) :"",
             facility_names: item.facility_names,
+            facilities: item.facilities,
             content_type: item.content_type,
             hours: item.hours,
             type: item.type,
@@ -80,7 +82,7 @@ const syncToMongoDB = async (datasetName) => {
         }
     }
 
-    return results;
+    // return results;
 };
 
 Apify.main(async () => {

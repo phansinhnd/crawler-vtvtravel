@@ -1,5 +1,4 @@
 const Apify = require('apify');
-const { ObjectId } = require('mongodb');
 const {
   utils: { sleep },
 } = Apify;
@@ -7,12 +6,15 @@ const {
 const md5 = require('md5');
 const logger = require('../logger');
 const { NAME } = require('../configs/config');
+const { getDataFromMongoDB, getRegionId } = require('../functions/handleRegions');
+// const getOpenHours = require('/bots/common/getOpenHours');
 const getOpenHours = require('../common/getOpenHours');
 const getDescription = require('../common/getDescription');
+const getFacilities = require('../common/getFacilities');
 const { v4: uuidv4 } = require('uuid');
-
 module.exports = async ({ $, request, page }) => {
   const restaurantDataset = await Apify.openDataset(NAME);
+  let region;
 
   const title = await page.title();
   logger.info(`DETAIL_PAGE: ${request.url}: ${title}`);
@@ -38,8 +40,9 @@ module.exports = async ({ $, request, page }) => {
 
   const shortDescription = await page.evaluate(() => $('.jmnaM').text());
 
-  const facilities = await page.evaluate(() => $(".tbUiL.b:contains('ĐẶC TRƯNG')").next('div').text().split(', '));
-
+  const facilities_name = await page.evaluate(() => $(".tbUiL.b:contains('ĐẶC TRƯNG')").next('div').text().split(', '));
+  const facilities = await getFacilities(facilities_name);
+  // console.log(facilities);
   const descriptionNew = await getDescription($, page);
 
   // dong popup mo ta chi tiet
@@ -80,14 +83,10 @@ module.exports = async ({ $, request, page }) => {
   const data = await page.evaluate(() => {
     const locationUri = $('div.kDZhm span a').attr('href');
     const location = locationUri.split('@').pop().split(',');
-
     const galleries = [];
     $('.photoGridBox .photoGridImg .fillSquare img').each(function () {
       galleries.push($(this).attr('src'));
     });
-
-
-
     return {
       loc: {
         type: 'Point',
@@ -105,12 +104,17 @@ module.exports = async ({ $, request, page }) => {
       email: $('.IdiaP.sNsFa:eq(1) a').attr('href').replace('mailto:', '').split('?')[0],
     };
   });
-
+  // const regionData = await getDataFromMongoDB();
+  // Lấy id của region
+  const dataRegion = await getDataFromMongoDB();
+  region = getRegionId(data.region_name, dataRegion);
   await restaurantDataset.pushData({
     ...data,
+    region: region,
     hours,
     short_description: shortDescription,
-    facility_names: facilities,
+    facility_names: facilities_name,
+    facilities,
     description: descriptionNew,
     ...request.userData,
     source_url: request.url,

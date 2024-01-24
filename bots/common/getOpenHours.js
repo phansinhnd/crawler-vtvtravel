@@ -45,4 +45,6 @@ module.exports = ($, page) => page.evaluate(() => {
     hours.push(openTime);
   });
   return hours;
+
+
 });

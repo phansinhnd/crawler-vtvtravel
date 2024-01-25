@@ -191,9 +191,9 @@ module.exports = async ({ $, request, page }) => {
       logo_url: $('.large_photo_wrapper img.basicImg').attr('src'),
       banner_url: galleries.length >= 2 ? galleries[1] : '',
       thumbnail_urls: galleries_output,
-      tel: $('span.AYHFM:first a').text().replace(/ /g, ''),
-      website: $("a:contains('Trang web')").attr('href'),
-      email: $('.IdiaP.sNsFa:eq(1) a').attr('href').replace('mailto:', '').split('?')[0],
+      tel: $('span.AYHFM:first a').length > 0? $('span.AYHFM:first a').text().replace(/ /g, ''):'',
+      website: $("a:contains('Trang web')").length > 0 ? $("a:contains('Trang web')").attr('href'): '',
+      email: $('.IdiaP.sNsFa:eq(1) a').length > 0 ? $('.IdiaP.sNsFa:eq(1) a').attr('href').replace('mailto:', '').split('?')[0]: '',
     };
   });
   // const regionData = await getDataFromMongoDB();

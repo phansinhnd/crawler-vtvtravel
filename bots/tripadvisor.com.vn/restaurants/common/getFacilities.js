@@ -51,9 +51,12 @@ module.exports =  async function getDataFromMongoDB(arr) {
             if (isInsert) {
                 const newData ={
                     name: facility,
+                    created: new Date(),
+                    modified: new Date(),
                 }
-                // await collection.insertOne(newData);
-                // console.log('chèn:', newData);
+               const dataInsert =  await collection.insertOne(newData);
+                // console.log('chèn:', newData, dataInsert.insertedId);
+                result.push(dataInsert.insertedId)
             }
         }
         return result;

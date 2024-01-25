@@ -48,6 +48,7 @@ const syncToMongoDB = async (datasetName) => {
             description_ascii: item.short_description ? diacritics.remove(item.short_description) :"",
             facility_names: item.facility_names,
             facilities: item.facilities,
+            rating: item.rating,
             content_type: item.content_type,
             hours: item.hours,
             type: item.type,
@@ -68,6 +69,8 @@ const syncToMongoDB = async (datasetName) => {
                     [(files.thumbnails)[0]]: item.thumbnail_urls
                 }
             },
+            created: new Date(),
+            modified: new Date(),
         };
         try {
             const result = await collection.insertOne(obj);
